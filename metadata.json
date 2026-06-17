@@ -1,0 +1,6 @@
+{
+  "name": "Day to Night Mall Inventory",
+  "description": "نظام لإدارة مخزون ودورة حياة بضائع مول داي تو نايت مع تنبيهات صلاحية منبثقة تفاعلية قبل 60 يوماً من الانتهاء.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

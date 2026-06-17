@@ -1,0 +1,50 @@
+[
+  {
+    "key": "groceries",
+    "nameAr": "مواد تموينية وجافة",
+    "nameEn": "Groceries & Dry Foods",
+    "subCategories": ["أرز ومكرونة", "زيت وسمن", "مشروبات ساخنة", "معلبات وبقوليات", "توابل ومكسبات طعم"]
+  },
+  {
+    "key": "dairy",
+    "nameAr": "ألبان وأجبان وصناعاتها",
+    "nameEn": "Dairy & Cheese",
+    "subCategories": ["حليب طازج ومعقم", "أجبان معبأة فيتا", "أجبان رومي وشيدر وجبن أبيض", "زبادي وقشطة"]
+  },
+  {
+    "key": "meat",
+    "nameAr": "لحوم ودواجن وأسماك",
+    "nameEn": "Butchery & Poultry",
+    "subCategories": ["لحوم بلدية ومجمدة", "مصنعات الدواجن بانيه وشيش", "أسماك مجمدة ورنجة"]
+  },
+  {
+    "key": "produce",
+    "nameAr": "خضروات وفواكه طازجة",
+    "nameEn": "Fresh Produce",
+    "subCategories": ["خضار طازج بالوزن", "فاكهة محلية", "فاكهة مستوردة فاخرة"]
+  },
+  {
+    "key": "bakery",
+    "nameAr": "مخبوزات وحلويات المول",
+    "nameEn": "Bakery & Sweets",
+    "subCategories": ["كرواسون وباتيه طازج", "حلويات شرقية وغربية", "شوكولاتة ومقرمشات معبأة"]
+  },
+  {
+    "key": "cleaning",
+    "nameAr": "منظفات ومستلزمات منزلية",
+    "nameEn": "Detergents & Cleaning",
+    "subCategories": ["مسحوق غسيل أوتوماتيك", "منظفات أواني ومطهرات", "مناديل ورقية ورول مطبخ"]
+  },
+  {
+    "key": "cosmetics",
+    "nameAr": "عناية شخصية وتجميل",
+    "nameEn": "Cosmetics & Personal Care",
+    "subCategories": ["شامبوهات وعناية بالشعر", "معجون أسنان وفرش", "صابون ترطيب وكريمات"]
+  },
+  {
+    "key": "electronics",
+    "nameAr": "أجهزة كهربائية ومنزلية",
+    "nameEn": "Electronics & Appliances",
+    "subCategories": ["بلندر وخلاطات", "غلايات وتوستر", "شاشات ومكبرات صوت"]
+  }
+]
