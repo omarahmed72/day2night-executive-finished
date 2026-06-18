@@ -4,6 +4,10 @@ var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
 var __copyProps = (to, from, except, desc) => {
   if (from && typeof from === "object" || typeof from === "function") {
     for (let key of __getOwnPropNames(from))
@@ -20,82 +24,25 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
   mod
 ));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // server.ts
+var server_exports = {};
+__export(server_exports, {
+  app: () => app
+});
+module.exports = __toCommonJS(server_exports);
 var import_express = __toESM(require("express"), 1);
 var import_path = __toESM(require("path"), 1);
 var import_fs = __toESM(require("fs"), 1);
 var import_vite = require("vite");
 var import_genai = require("@google/genai");
-var import_mongoose = __toESM(require("mongoose"), 1);
-var import_dotenv = __toESM(require("dotenv"), 1);
-import_dotenv.default.config();
 var app = (0, import_express.default)();
-var PORT = 3e3;
-var DB_FILE = import_path.default.join(process.cwd(), "products_db.json");
-var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/day2night";
-var JSONFileSchema = new import_mongoose.default.Schema({
-  filename: { type: String, unique: true },
-  content: String
-});
-var JSONFileModel = import_mongoose.default.model("JSONFile", JSONFileSchema);
-var dbCache = {};
-var originalReadFileSync = import_fs.default.readFileSync;
-var originalWriteFileSync = import_fs.default.writeFileSync;
-var originalExistsSync = import_fs.default.existsSync;
-import_fs.default.readFileSync = function(pathLike, options) {
-  const fileStr = String(pathLike);
-  const basename = import_path.default.basename(fileStr);
-  if (basename.endsWith("_db.json")) {
-    if (dbCache[basename] !== void 0) {
-      return dbCache[basename];
-    }
-  }
-  return originalReadFileSync.apply(this, arguments);
-};
-import_fs.default.writeFileSync = function(pathLike, data, options) {
-  const fileStr = String(pathLike);
-  const basename = import_path.default.basename(fileStr);
-  if (basename.endsWith("_db.json")) {
-    dbCache[basename] = String(data);
-    JSONFileModel.updateOne(
-      { filename: basename },
-      { content: String(data) },
-      { upsert: true }
-    ).catch((err) => console.error("MongoDB Sync Error for", basename, err));
-  }
-  return originalWriteFileSync.apply(this, arguments);
-};
-import_fs.default.existsSync = function(pathLike) {
-  const fileStr = String(pathLike);
-  const basename = import_path.default.basename(fileStr);
-  if (basename.endsWith("_db.json")) {
-    if (dbCache[basename] !== void 0) return true;
-  }
-  return originalExistsSync.apply(this, arguments);
-};
-async function loadMongoDBIntoCache() {
-  try {
-    const allFiles = await JSONFileModel.find({});
-    for (const file of allFiles) {
-      if (file.filename && file.content) {
-        dbCache[file.filename] = file.content;
-      }
-    }
-    console.log(`Loaded ${allFiles.length} database files from MongoDB into memory cache.`);
-  } catch (e) {
-    console.error("Failed to load from MongoDB", e);
-  }
-}
+var PORT = Number(process.env.PORT) || 3e3;
+var DATA_DIR = process.env.DATA_DIR || process.cwd();
+var DB_FILE = import_path.default.join(DATA_DIR, "products_db.json");
 app.use(import_express.default.json({ limit: "50mb" }));
 app.use(import_express.default.urlencoded({ limit: "50mb", extended: true }));
-app.post("/api/mongo-test", (req, res) => {
-  if (import_mongoose.default.connection.readyState === 1) {
-    res.json({ success: true, message: "MongoDB is connected!" });
-  } else {
-    res.status(500).json({ success: false, message: "MongoDB is not connected", state: import_mongoose.default.connection.readyState });
-  }
-});
 var aiClient = null;
 function getGeminiClient() {
   if (!aiClient) {
@@ -399,7 +346,8 @@ function writeDatabase(data) {
     console.error("Failed to persist database file", err);
   }
 }
-var TRANSACTIONS_FILE = import_path.default.join(process.cwd(), "transactions_db.json");
+readDatabase();
+var TRANSACTIONS_FILE = import_path.default.join(DATA_DIR, "transactions_db.json");
 function getProductInfo(productId) {
   const p = INITIAL_PRODUCTS_SEED.find((item) => item.id === productId);
   return p ? {
@@ -502,6 +450,7 @@ function writeTransactions(data) {
   } catch (e) {
   }
 }
+readTransactions();
 app.get("/api/products", (req, res) => {
   const dbData = readDatabase();
   res.json(dbData);
@@ -539,11 +488,11 @@ app.delete("/api/products/:id", (req, res) => {
     res.status(404).json({ success: false, message: "Product not found" });
   }
 });
-var CUSTOMERS_FILE = import_path.default.join(process.cwd(), "customers_db.json");
-var INVOICES_FILE = import_path.default.join(process.cwd(), "invoices_db.json");
-var TRANSFERS_FILE = import_path.default.join(process.cwd(), "transfers_db.json");
-var SUPPLIERS_FILE = import_path.default.join(process.cwd(), "suppliers_db.json");
-var SUPPLIER_PAYMENTS_FILE = import_path.default.join(process.cwd(), "supplier_payments_db.json");
+var CUSTOMERS_FILE = import_path.default.join(DATA_DIR, "customers_db.json");
+var INVOICES_FILE = import_path.default.join(DATA_DIR, "invoices_db.json");
+var TRANSFERS_FILE = import_path.default.join(DATA_DIR, "transfers_db.json");
+var SUPPLIERS_FILE = import_path.default.join(DATA_DIR, "suppliers_db.json");
+var SUPPLIER_PAYMENTS_FILE = import_path.default.join(DATA_DIR, "supplier_payments_db.json");
 var INITIAL_SUPPLIERS_BACKEND = [
   { id: "sup-1", nameAr: "\u062C\u0647\u064A\u0646\u0629 \u0644\u0645\u0646\u062A\u062C\u0627\u062A \u0627\u0644\u0623\u0644\u0628\u0627\u0646", nameEn: "Juhayna Dairy Corp", phone: "16630", email: "info@juhayna.com", category: "dairy" },
   { id: "sup-2", nameAr: "\u062F\u0648\u0645\u062A\u064A \u0644\u0644\u0623\u063A\u0630\u064A\u0629", nameEn: "Domty Foods", phone: "16115", email: "sales@domty.com", category: "dairy" },
@@ -1356,8 +1305,8 @@ app.post("/api/products/quick-action", (req, res) => {
   writeDatabase(dbData);
   res.json({ success: true, products: dbData, product });
 });
-var STAFF_FILE = import_path.default.join(process.cwd(), "staff_db.json");
-var LOGS_FILE = import_path.default.join(process.cwd(), "logs_db.json");
+var STAFF_FILE = import_path.default.join(DATA_DIR, "staff_db.json");
+var LOGS_FILE = import_path.default.join(DATA_DIR, "logs_db.json");
 var INITIAL_STAFF_SEED = [
   {
     username: "admin",
@@ -1627,7 +1576,7 @@ app.post("/api/logs/custom", (req, res) => {
   }
   res.json({ success: true });
 });
-var WAREHOUSES_FILE = import_path.default.join(process.cwd(), "warehouses_db.json");
+var WAREHOUSES_FILE = import_path.default.join(DATA_DIR, "warehouses_db.json");
 var INITIAL_WAREHOUSES = [
   { id: "w-1", name: "\u0627\u0644\u0645\u0633\u062A\u0648\u062F\u0639 \u0627\u0644\u0631\u0626\u064A\u0633\u064A \u0627\u0644\u0645\u063A\u0630\u0649", responsible: "\u0623\u062D\u0645\u062F \u0639\u0628\u062F \u0627\u0644\u0639\u0627\u0644", location: "\u0627\u0644\u0645\u0646\u0637\u0642\u0629 \u0627\u0644\u0635\u0646\u0627\u0639\u064A\u0629 - \u0627\u0644\u062C\u064A\u0632\u0629", capacity: "10,000 \u0643\u0631\u062A\u0648\u0646\u0629" },
   { id: "w-2", name: "\u0645\u062E\u0632\u0646 \u0627\u0644\u0633\u0644\u0639 \u0627\u0644\u0645\u0628\u0631\u062F\u0629 \u0648\u0627\u0644\u0623\u0644\u0628\u0627\u0646", responsible: "\u0633\u0627\u0631\u0629 \u0627\u0644\u062C\u064A\u0627\u062F", location: "\u0628\u062F\u0631\u0648\u0645 \u0627\u0644\u0645\u0648\u0644 \u0627\u0644\u0631\u0626\u064A\u0633\u064A", capacity: "3,000 \u0644\u062A\u0631" },
@@ -1675,7 +1624,7 @@ app.post("/api/warehouses", (req, res) => {
   writeWarehouses(list);
   res.json({ success: true, warehouses: list, warehouse: newW });
 });
-var FINANCIAL_FILE = import_path.default.join(process.cwd(), "financials_db.json");
+var FINANCIAL_FILE = import_path.default.join(DATA_DIR, "financials_db.json");
 var INITIAL_FINANCIALS = {
   accounts: [
     { code: "101", name: "\u062E\u0632\u064A\u0646\u0629 \u0627\u0644\u0643\u0627\u0634\u064A\u0631 \u0648\u0627\u0644\u0635\u0646\u062F\u0648\u0642", type: "debit", balance: 45e3 },
@@ -1921,7 +1870,7 @@ app.post("/api/financials/loans", (req, res) => {
   writeFinancials(fin);
   res.json({ success: true, financials: fin });
 });
-var HR_FILE = import_path.default.join(process.cwd(), "hr_db.json");
+var HR_FILE = import_path.default.join(DATA_DIR, "hr_db.json");
 var INITIAL_HR = {
   attendance: [
     { username: "admin", date: "2026-06-14", clockIn: "08:45 AM", clockOut: "05:15 PM", status: "present" },
@@ -2108,7 +2057,7 @@ app.post("/api/products/scan-invoice", async (req, res) => {
     });
   }
 });
-var CATEGORIES_FILE = import_path.default.join(process.cwd(), "categories_db.json");
+var CATEGORIES_FILE = import_path.default.join(DATA_DIR, "categories_db.json");
 function readCategories() {
   try {
     if (import_fs.default.existsSync(CATEGORIES_FILE)) {
@@ -2334,23 +2283,14 @@ app.post("/api/products/discounts/bulk", (req, res) => {
   res.json({ success: true, products: dbData, updatedCount });
 });
 async function startServer() {
-  try {
-    await import_mongoose.default.connect(MONGODB_URI);
-    console.log("Successfully connected to MongoDB Cluster!");
-    await loadMongoDBIntoCache();
-    readDatabase();
-    readTransactions();
-  } catch (err) {
-    console.error("Error connecting to MongoDB:", err);
-  }
-  if (process.env.NODE_ENV !== "production") {
+  if (process.env.NODE_ENV === "development") {
     const vite = await (0, import_vite.createServer)({
       server: { middlewareMode: true },
       appType: "spa"
     });
     app.use(vite.middlewares);
   } else {
-    const distPath = import_path.default.join(process.cwd(), "dist");
+    const distPath = import_path.default.join(DATA_DIR, "dist");
     app.use(import_express.default.static(distPath));
     app.get("*", (req, res) => {
       res.sendFile(import_path.default.join(distPath, "index.html"));
@@ -2360,5 +2300,11 @@ async function startServer() {
     console.log(`Server running on port ${PORT}`);
   });
 }
-startServer();
+if (!process.env.AWS_LAMBDA_RUNTIME_API) {
+  startServer();
+}
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  app
+});
 //# sourceMappingURL=server.cjs.map
